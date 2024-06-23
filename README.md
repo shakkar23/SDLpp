@@ -7,22 +7,20 @@ Feel free to suggest additions, and changes to the class to encapsulate more of 
 ## Window features
 - NxM window size
 - Texture rendering
-- clearing the screen
-- displaying the screen to the user
-- creating textures from surfaces
-- stack based coloring system
-- drawing primitives such as
-  - wire frame rectangles
-  - filled rectangles
-  - wire frame circles
-- bad text rendering
+- Grabbing the Window as a Surface
+- Clearing the screen
+- Displaying the screen to the user
+- Creating textures from surfaces
+- Stack based coloring system
+- Drawing primitives such as
+  - Wire frame rectangles
+  - Filled rectangles
+  - Wire frame circles
 
 ## Dependencies
-- SDL2
-- SDL2_TTF
+- SDL2.h
 
 ## TODO
-- make the class a header only library
-- add macro(s) specifying if we should include the TTF functions in the active source
 - add more SDL2 functionality related to the SDL `SDL_Window` and `SDL_Renderer` to the class
 - move out unrelated but useful functions to its own header only library
+- add good text rendering with anti-aliasing
