@@ -113,7 +113,6 @@ Window::Window(const char* p_title, const int p_w, const int p_h)
 Window::~Window() {
     SDL_DestroyRenderer(this->renderer);
     SDL_DestroyWindow(this->window);
-    TTF_CloseFont(default_font);
 }
 
 int Window::getRefreshrate() {
@@ -123,7 +122,7 @@ int Window::getRefreshrate() {
     return mode.refresh_rate;
 }
 
-std::pair<int, int> getWindowSize() {
+std::pair<int, int> Window::getWindowSize() {
     int x, y;
     SDL_GetWindowSize(this->window, &x, &y);
     return { x, y };
