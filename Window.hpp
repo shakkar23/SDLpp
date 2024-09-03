@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 
 #include <stack>
+#include <iostream>
 #include <string>
 #include <utility>
 
@@ -55,13 +56,8 @@ private:
     std::stack<SDL_Color> colors;
 };
 
-#ifdef WINDOW_IMPL
 
-#include <SDL2/SDL.h>
-
-#include <iostream>
-
-Window::Window(const char* p_title, const int p_w, const int p_h)
+inline Window::Window(const char* p_title, const int p_w, const int p_h)
     : window(NULL), renderer(NULL) {
     this->window =
         SDL_CreateWindow(p_title, SDL_WINDOWPOS_UNDEFINED,
@@ -110,31 +106,35 @@ Window::Window(const char* p_title, const int p_w, const int p_h)
     SDL_FreeSurface(surface);
 }
 
-Window::~Window() {
+//
+// IMPLEMENTATION
+//
+
+inline Window::~Window() {
     SDL_DestroyRenderer(this->renderer);
     SDL_DestroyWindow(this->window);
 }
 
-int Window::getRefreshrate() {
+inline int Window::getRefreshrate() {
     int displayIndex = SDL_GetWindowDisplayIndex(this->window);
     SDL_DisplayMode mode;
     SDL_GetDisplayMode(displayIndex, 0, &mode);
     return mode.refresh_rate;
 }
 
-std::pair<int, int> Window::getWindowSize() {
+inline std::pair<int, int> Window::getWindowSize() {
     int x, y;
     SDL_GetWindowSize(this->window, &x, &y);
     return { x, y };
 }
 
-void Window::setWindowSize(int x, int y) {
+inline void Window::setWindowSize(int x, int y) {
     SDL_SetWindowSize(this->window, x, y);
 }
 
 // passing in a src with all zeros will grab the entire texture
 // returns weather it worked or not
-bool Window::render(SDL_Rect src, SDL_Rect dst, SDL_Texture* tex) {
+inline bool Window::render(SDL_Rect src, SDL_Rect dst, SDL_Texture* tex) {
 
     auto checkIfSet = [&](SDL_Rect box) {if ((box.x == 0) && (box.y == 0) && (box.w == 0) && (box.h == 0)) return true; else return false; };
 
@@ -148,20 +148,20 @@ bool Window::render(SDL_Rect src, SDL_Rect dst, SDL_Texture* tex) {
 
 }
 
-void Window::renderCopy(SDL_Texture* texture, const SDL_Rect* srcrect, const SDL_Rect* dstrect) {
+inline void Window::renderCopy(SDL_Texture* texture, const SDL_Rect* srcrect, const SDL_Rect* dstrect) {
     SDL_RenderCopy(renderer, texture, srcrect, dstrect);
 }
 
 
-SDL_Renderer* Window::getRenderer() {
+inline SDL_Renderer* Window::getRenderer() {
     return renderer;
 }
 
-void Window::display() { SDL_RenderPresent(this->renderer); }
+inline void Window::display() { SDL_RenderPresent(this->renderer); }
 
-void Window::clear() { SDL_RenderClear(this->renderer); }
+inline void Window::clear() { SDL_RenderClear(this->renderer); }
 
-void Window::drawCircle(int X, int Y, int r) {
+inline void Window::drawCircle(int X, int Y, int r) {
     const int32_t diameter = (r * 2);
 
     int32_t x = (r - 1);
@@ -202,21 +202,21 @@ void Window::drawCircle(int X, int Y, int r) {
 
 
 
-void Window::drawRect(SDL_Rect rec)
+inline void Window::drawRect(SDL_Rect rec)
 {
     SDL_RenderDrawRect(renderer, &rec);
 }
 
-void Window::drawRectFilled(SDL_Rect rec)
+inline void Window::drawRectFilled(SDL_Rect rec)
 {
     SDL_RenderFillRect(renderer, &rec);
 }
 
-SDL_Texture* Window::CreateTextureFromSurface(SDL_Surface* surface) {
+inline SDL_Texture* Window::CreateTextureFromSurface(SDL_Surface* surface) {
     return SDL_CreateTextureFromSurface(this->renderer, surface);
 }
 
-SDL_Texture* Window::CreateTextureFromWindow()
+inline SDL_Texture* Window::CreateTextureFromWindow()
 {
     auto surface = SDL_GetWindowSurface(window);
     auto texture = SDL_CreateTextureFromSurface(renderer, surface);
@@ -226,30 +226,30 @@ SDL_Texture* Window::CreateTextureFromWindow()
     return texture;
 }
 
-void Window::setDrawColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+inline void Window::setDrawColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 {
     SDL_SetRenderDrawColor(renderer, r, g, b, a);
 }
 
-void Window::getDrawColor(Uint8& r, Uint8& g, Uint8& b, Uint8& a)
+inline void Window::getDrawColor(Uint8& r, Uint8& g, Uint8& b, Uint8& a)
 {
     SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
 }
 
-void Window::push_color(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
+inline void Window::push_color(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
     SDL_Color color;
     SDL_GetRenderDrawColor(renderer, &color.r, &color.g, &color.b, &color.a);
     colors.push(color);
     SDL_SetRenderDrawColor(renderer, r, g, b, a);
 }
 
-void Window::pop_color() {
+inline void Window::pop_color() {
     SDL_Color color = colors.top();
     colors.pop();
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 }
 
-SDL_Rect Window::getInnerRect(SDL_Rect parent, float aspect_ratio) {
+inline SDL_Rect Window::getInnerRect(SDL_Rect parent, float aspect_ratio) {
     int height, width;
     if ((float)parent.w / parent.h > aspect_ratio) {
         height = std::min(parent.h, int(parent.w / aspect_ratio));
@@ -264,6 +264,3 @@ SDL_Rect Window::getInnerRect(SDL_Rect parent, float aspect_ratio) {
 
     return board;
 }
-
-#endif // WINDOW_IMPL
-
