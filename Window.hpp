@@ -15,20 +15,22 @@ constexpr int UPDATES_PER_SECOND = UPS;
 
 class Window {
 public:
-    Window(const char* p_title, int p_w, int p_h);
-    ~Window();
-    // window related
-    int getRefreshrate();
-    std::pair<int, int> getWindowSize();
-    void setWindowSize(int x, int y);
-    // drawing related
-    bool render(SDL_Rect src, SDL_Rect dst, SDL_Texture* tex);
+ Window(const char* p_title, const int p_w, const int p_h);
+ Window(const char* p_title, const double r_w, const double r_h);
+ ~Window();
+ // window related
+ int getRefreshrate();
+ std::pair<int, int> getWindowSize();
+ void setWindowSize(int x, int y);
+ // drawing related
+ bool render(SDL_Rect src, SDL_Rect dst, SDL_Texture* tex);
 
-    void renderCopy(SDL_Texture* texture,
-        const SDL_Rect* srcrect,
-        const SDL_Rect* dstrect);
+ void renderCopy(SDL_Texture* texture,
+                 const SDL_Rect* srcrect,
+                 const SDL_Rect* dstrect);
 
-    void display();
+ void display();
+
 public:
     void clear();
     void drawCircle(int x, int y, int r);
@@ -56,6 +58,9 @@ private:
     std::stack<SDL_Color> colors;
 };
 
+//
+// IMPLEMENTATION
+//
 
 inline Window::Window(const char* p_title, const int p_w, const int p_h)
     : window(NULL), renderer(NULL) {
@@ -106,9 +111,18 @@ inline Window::Window(const char* p_title, const int p_w, const int p_h)
     SDL_FreeSurface(surface);
 }
 
-//
-// IMPLEMENTATION
-//
+inline Window::Window(const char* p_title, const double r_w, const double r_h) {
+    SDL_DisplayMode mode{};
+    SDL_GetCurrentDisplayMode(0, &mode);
+
+    // call the other constructor
+    auto tmp = Window(p_title, int(mode.w * r_w), int(mode.h * r_h));
+    
+    *this = tmp;
+
+    tmp.renderer = NULL;
+    tmp.window = NULL;
+}
 
 inline Window::~Window() {
     SDL_DestroyRenderer(this->renderer);
