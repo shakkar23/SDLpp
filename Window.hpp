@@ -23,6 +23,8 @@ class Window {
     int getRefreshrate();
     std::pair<int, int> getWindowSize();
     void setWindowSize(int x, int y);
+	void setTitle(const char* title);
+
     // drawing related
     bool render(SDL_Rect src, SDL_Rect dst, SDL_Texture* tex);
 
@@ -42,14 +44,15 @@ class Window {
 
     SDL_Texture* CreateTextureFromWindow();
 
+
     void setDrawColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
     void getDrawColor(Uint8& r, Uint8& g, Uint8& b, Uint8& a);
 
     void push_color(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
     void pop_color();
 
-    SDL_Rect getInnerRect(SDL_Rect parent, float aspect_ratio);
-
+    static SDL_Rect getInnerRect(SDL_Rect parent, float aspect_ratio);
+	static SDL_Rect getLogicalRect(SDL_Rect parent, SDL_Rect child, float sim_width, float sim_height);
 
     SDL_Renderer* getRenderer();
    private:
@@ -143,11 +146,15 @@ inline void Window::setWindowSize(int x, int y) {
     SDL_SetWindowSize(this->window, x, y);
 }
 
+inline void Window::setTitle(const char* title) {
+	SDL_SetWindowTitle(window, title);
+}
+
 // passing in a src with all zeros will grab the entire texture
 // returns weather it worked or not
 inline bool Window::render(SDL_Rect src, SDL_Rect dst, SDL_Texture* tex) {
-    auto checkIfSet = [&](SDL_Rect box) {if ((box.x == 0) && (box.y == 0) && (box.w == 0) && (box.h == 0)) return true; else return false; };
-
+    auto checkIfSet = [](SDL_Rect box) {if ((box.x == 0) && (box.y == 0) && (box.w == 0) && (box.h == 0)) return true; else return false; };
+    
     auto err = SDL_RenderCopy(this->renderer, tex, (checkIfSet(src)) ? NULL : &src, &dst);
 
     if (err != 0) {
@@ -260,4 +267,24 @@ inline SDL_Rect Window::getInnerRect(SDL_Rect parent, float aspect_ratio) {
     SDL_Rect board = {parent.x + (parent.w - width) / 2, parent.y + (parent.h - height) / 2, width, height};
 
     return board;
+}
+
+
+inline SDL_Rect Window::getLogicalRect(SDL_Rect parent, SDL_Rect child, float sim_width, float sim_height) {
+    SDL_Rect logical = {
+        parent.x + int(
+            (parent.w * (child.x / sim_width))
+            ),
+        parent.y + int(
+			(parent.h * (child.y / sim_height))
+            ),
+        int(
+            std::ceil(parent.w * (child.w / sim_width))
+            ),
+        int(
+            std::ceil(parent.h * (child.h / sim_height))
+            )
+    };
+
+	return logical;
 }
