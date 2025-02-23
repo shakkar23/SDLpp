@@ -41,15 +41,12 @@ class Window {
     void drawRectFilled(SDL_Rect rec);
     // utility
     SDL_Texture* CreateTextureFromSurface(SDL_Surface* surface);
-
     SDL_Texture* CreateTextureFromWindow();
+	SDL_Surface* getWindowSurface();
 
 
     void setDrawColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
     void getDrawColor(Uint8& r, Uint8& g, Uint8& b, Uint8& a);
-
-    void push_color(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
-    void pop_color();
 
     static SDL_Rect getInnerRect(SDL_Rect parent, float aspect_ratio);
 	static SDL_Rect getLogicalRect(SDL_Rect parent, SDL_Rect child, float sim_width, float sim_height);
@@ -233,25 +230,16 @@ inline SDL_Texture* Window::CreateTextureFromWindow() {
     return texture;
 }
 
+inline SDL_Surface* Window::getWindowSurface() {
+	return SDL_GetWindowSurface(window);
+}
+
 inline void Window::setDrawColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
     SDL_SetRenderDrawColor(renderer, r, g, b, a);
 }
 
 inline void Window::getDrawColor(Uint8& r, Uint8& g, Uint8& b, Uint8& a) {
     SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
-}
-
-inline void Window::push_color(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
-    SDL_Color color;
-    SDL_GetRenderDrawColor(renderer, &color.r, &color.g, &color.b, &color.a);
-    colors.push(color);
-    SDL_SetRenderDrawColor(renderer, r, g, b, a);
-}
-
-inline void Window::pop_color() {
-    SDL_Color color = colors.top();
-    colors.pop();
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 }
 
 inline SDL_Rect Window::getInnerRect(SDL_Rect parent, float aspect_ratio) {

@@ -116,6 +116,15 @@ public:
 		texture(nullptr),
 		path(),
 		destRect({}) {};
+	SurfaceTexture(Window& window, int w, int h) {
+		this->surface = SDL_CreateRGBSurface(0, w, h, 32, 
+			0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
+		this->texture = nullptr;
+		this->destRect = { 0, 0, w, h };
+
+		window.setDrawColor(0, 0, 0, 255);
+		this->drawRectFilled(window, destRect);
+	}
 
 	SurfaceTexture(Window& window, std::string_view path) {
 
@@ -185,6 +194,7 @@ public:
 
 	// util
 	void drawRectFilled(Window& window, SDL_Rect dest);
+	void blitSurface(Window& window, SDL_Surface* src, SDL_Rect dest);
 	void render(Window& renderer) override;
 
 	// call this after youve made modifications using the other utility functions to "save" the changes into the texture

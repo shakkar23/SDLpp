@@ -22,6 +22,11 @@ void SurfaceTexture::drawRectFilled(Window& window, SDL_Rect dest) {
 	SDL_FillRect(this->surface, &dest, SDL_MapRGBA(this->surface->format, r, g, b, a));
 }
 
+void SurfaceTexture::blitSurface(Window& window, SDL_Surface* src, SDL_Rect dest) {
+	SDL_Rect src_rect = { 0,0,src->w,src->h };
+	SDL_BlitScaled(src, &src_rect, this->surface, &dest);
+}
+
 void SurfaceTexture::render(Window& window) {
 
 #ifdef WIN32
@@ -31,6 +36,14 @@ void SurfaceTexture::render(Window& window) {
 	if (window.render({ 0,0,0,0 }, this->destRect, this->texture))
 		return;
 
+	if(this->surface)
+	{
+		this->createTexture(window);
+		if (window.render({ 0,0,0,0 }, this->destRect, this->texture))
+			return;
+	}
+
+	// if all else fails, reload the texture from the path
 	(*this) = TextureDictionary::reloadST(window, this->path);
 	window.render({ 0,0,0,0 }, this->destRect, this->texture);
 }
