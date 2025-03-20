@@ -49,6 +49,7 @@ class Window {
     void getDrawColor(Uint8& r, Uint8& g, Uint8& b, Uint8& a);
 
     static SDL_Rect getInnerRect(SDL_Rect parent, float aspect_ratio);
+    static SDL_Rect getOuterRect(SDL_Rect parent, float aspect_ratio);
 	static SDL_Rect getLogicalRect(SDL_Rect parent, SDL_Rect child, float sim_width, float sim_height);
 
     SDL_Renderer* getRenderer();
@@ -253,6 +254,22 @@ inline SDL_Rect Window::getInnerRect(SDL_Rect parent, float aspect_ratio) {
     }
 
     SDL_Rect board = {parent.x + (parent.w - width) / 2, parent.y + (parent.h - height) / 2, width, height};
+
+    return board;
+}
+
+
+inline SDL_Rect Window::getOuterRect(SDL_Rect parent, float aspect_ratio) {
+    int height, width;
+    if ((double)parent.w / parent.h > aspect_ratio) {
+        height = std::max(parent.h, int(parent.w / aspect_ratio));
+        width = parent.w;
+    } else {
+        width = std::max(parent.w, int(parent.h * aspect_ratio));
+        height = parent.h;
+    }
+
+    SDL_Rect board = { parent.x + (parent.w - width) / 2, parent.y + (parent.h - height) / 2, width, height };
 
     return board;
 }
